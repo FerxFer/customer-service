@@ -1,5 +1,8 @@
 package com.tp.customerservice.service;
 
+import com.tp.customerservice.client.ProductoClient;
+import com.tp.customerservice.dto.ClienteConProductosDTO;
+import com.tp.customerservice.dto.ProductoResponseDTO;
 import com.tp.customerservice.dto.ClienteRequestDTO;
 import com.tp.customerservice.dto.ClienteResponseDTO;
 import com.tp.customerservice.entity.Cliente;
@@ -20,6 +23,20 @@ public class ClienteService {
 
     @Autowired
     private ClienteMapper clienteMapper;
+
+    @Autowired
+    private ProductoClient productoClient;
+
+    // Obtener cliente con sus productos
+    public ClienteConProductosDTO obtenerClienteConProductos(Long id) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new ClienteNoEncontradoException(id));
+
+        ClienteResponseDTO clienteDTO = clienteMapper.toResponseDTO(cliente);
+        List<ProductoResponseDTO> productos = productoClient.obtenerProductosPorCliente(id);
+
+        return new ClienteConProductosDTO(clienteDTO, productos);
+    }
 
     // Obtener todos los clientes
     public List<ClienteResponseDTO> listarTodos() {
